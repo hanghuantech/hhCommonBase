@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import com.hzhanghuan.hhCommonBase.dao.BaseDao;
 import com.hzhanghuan.hhCommonBase.entity.PageBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
@@ -49,10 +48,10 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 	 * 更新
 	 */
 	@Override
-	public int update(T duixiang) {
+	public int update(T object) {
 		String update="update"+clazz.getSimpleName()+"ById";
 		System.out.println("更新"+update);
-		return sqlSessionTemplate.update(update, duixiang);
+		return sqlSessionTemplate.update(update, object);
 	}
 
 	@Override
@@ -90,26 +89,6 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 		return sqlSessionTemplate.selectOne(count, hashMap);
 	}
 
-	/**
-	 * 分页
-	 */
-	@Override
-	public PageBean<T> getPageBeanOld(HashMap<Object, Object> hashMap) {
-		System.out.println("分页");
-		String getPageBean = "select"+clazz.getSimpleName()+"sByConditions";
-		System.out.println(getPageBean);
-		
-		// TODO: 命名需要变更
-		int pageNum = Integer.parseInt(hashMap.get("pageNum").toString());
-		int pageSize = Integer.parseInt(hashMap.get("pageSize").toString());
-		hashMap.put("pageNum", (pageNum-1)*pageSize);
-		hashMap.put("pageSize",((pageNum-1)*pageSize)+pageSize);
-		
-		int count = count(hashMap);
-		List<T> list = sqlSessionTemplate.selectList(getPageBean,hashMap);
-		PageBean<T> pageBean = new PageBean<T>(pageNum, pageSize, count, list);
-		return pageBean;
-	}
 	@Override
 	public List<T> getByCondition(HashMap<Object,Object> hashMap){
 		String getPageBean = "get"+clazz.getSimpleName()+"sByConditions";

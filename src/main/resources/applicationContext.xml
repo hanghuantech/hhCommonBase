@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+    	http://www.springframework.org/schema/context
+    	http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+    	http://www.springframework.org/schema/beans  
+        http://www.springframework.org/schema/beans/spring-beans.xsd  
+        http://www.springframework.org/schema/tx  
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+     
+    <!-- 自动扫描与装配bean -->
+	<context:component-scan base-package="com.hzhanghuan"></context:component-scan>
+
+    <!-- 导入jdbc配置文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties" />
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" primary="true">
+        <property name="driverClassName" value="${driverClass}" />
+        <property name="url" value="${jdbcUrl}" />
+        <property name="username" value="${username}" />
+        <property name="password" value="${password}" />
+        <property name="maxActive" value="10000"></property>
+        <property name="maxIdle" value="30"></property>
+        <property name="maxWait" value="600000"></property>
+        <property name="defaultAutoCommit" value="true"></property>
+    </bean>
+
+    <!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- Mybatis的事务管理器，底层JDBC事务管理器 -->
+    <bean id="dataSourceTransactionManagerID"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- 采用注解方式 -->
+    <tx:annotation-driven transaction-manager="dataSourceTransactionManagerID" />
+
+
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" primary="true">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="dataSource"></property>  
+    </bean>
+</beans>
